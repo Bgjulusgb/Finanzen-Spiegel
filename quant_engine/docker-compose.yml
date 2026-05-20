@@ -1,0 +1,31 @@
+services:
+  quant-engine:
+    build: .
+    image: quant-engine:latest
+    container_name: quant-engine
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      QUANT_HOST: 0.0.0.0
+      QUANT_PORT: 8080
+      QUANT_LOG_LEVEL: INFO
+      QUANT_DB_PATH: /app/data/quant.db
+      QUANT_ASSET_SYMBOL: ${QUANT_ASSET_SYMBOL:-NVDA}
+      QUANT_ASSET_NAME: ${QUANT_ASSET_NAME:-NVIDIA Corporation}
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Optional: Redis fuer verteilten Cache
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: quant-engine-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"

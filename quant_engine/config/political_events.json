@@ -1,0 +1,46 @@
+{
+  "_comment": "Schluesselworte fuer Erkennung politischer/geopolitischer Ereignisse. Kategorien werden vom Severity-Modell gewichtet (settings.political_risk.severity_weights).",
+  "categories": {
+    "war": {
+      "en": ["war", "invasion", "military strike", "armed conflict", "attack on", "missile strike"],
+      "de": ["krieg", "invasion", "militaerschlag", "bewaffneter konflikt", "raketenangriff"]
+    },
+    "sanctions": {
+      "en": ["sanction", "sanctions", "blacklist", "asset freeze"],
+      "de": ["sanktion", "sanktionen", "schwarze liste", "vermoegensperre"]
+    },
+    "embargo": {
+      "en": ["embargo", "export ban", "import ban"],
+      "de": ["embargo", "exportverbot", "importverbot"]
+    },
+    "tariff": {
+      "en": ["tariff", "tariffs", "import duty", "customs duty"],
+      "de": ["zoll", "zoelle", "einfuhrabgabe", "strafzoll"]
+    },
+    "trade_war": {
+      "en": ["trade war", "trade dispute", "trade tension"],
+      "de": ["handelskrieg", "handelsstreit", "handelsspannung"]
+    },
+    "election": {
+      "en": ["election", "vote", "ballot", "referendum", "primaries"],
+      "de": ["wahl", "wahlen", "abstimmung", "referendum", "vorwahl"]
+    },
+    "regulation": {
+      "en": ["regulation", "regulator", "ban", "investigation", "antitrust", "compliance probe"],
+      "de": ["regulierung", "regulierer", "verbot", "untersuchung", "kartell", "ermittlung"]
+    },
+    "rate_decision": {
+      "en": ["rate hike", "rate cut", "interest rate", "fed decision", "ecb decision", "monetary policy"],
+      "de": ["zinsentscheidung", "leitzins", "ezb", "fed-entscheidung", "geldpolitik", "zinserhoehung", "zinssenkung"]
+    }
+  },
+  "exposure_map": {
+    "_comment": "Optional: Symbol -> Sektoren-Exposure (0..1). Default 0.5.",
+    "NVDA": { "war": 0.4, "sanctions": 0.9, "tariff": 0.85, "election": 0.4, "regulation": 0.75, "rate_decision": 0.7, "trade_war": 0.95, "embargo": 0.9 },
+    "TSLA": { "war": 0.3, "sanctions": 0.6, "tariff": 0.8, "election": 0.7, "regulation": 0.8, "rate_decision": 0.7, "trade_war": 0.75, "embargo": 0.5 },
+    "RHM.DE": { "war": 1.0, "sanctions": 0.7, "tariff": 0.5, "election": 0.6, "regulation": 0.5, "rate_decision": 0.4, "trade_war": 0.5, "embargo": 0.6 },
+    "BTC-USD": { "war": 0.5, "sanctions": 0.85, "tariff": 0.2, "election": 0.5, "regulation": 0.95, "rate_decision": 0.85, "trade_war": 0.3, "embargo": 0.4 },
+    "GC=F": { "war": 0.95, "sanctions": 0.6, "tariff": 0.3, "election": 0.5, "regulation": 0.3, "rate_decision": 0.9, "trade_war": 0.5, "embargo": 0.5 },
+    "^GSPC": { "war": 0.6, "sanctions": 0.5, "tariff": 0.7, "election": 0.65, "regulation": 0.5, "rate_decision": 0.85, "trade_war": 0.75, "embargo": 0.5 }
+  }
+}
