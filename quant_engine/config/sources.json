@@ -1,0 +1,193 @@
+{
+  "_comment": "Quellen mit Vertrauensgewicht (0..1). Quellen ohne Match-Pattern werden generisch geprueft.",
+  "sources": [
+    {
+      "id": "reuters_business",
+      "name": "Reuters Business",
+      "url": "https://feeds.reuters.com/reuters/businessNews",
+      "type": "rss",
+      "trust": 1.0,
+      "lang": "en",
+      "category": "wire"
+    },
+    {
+      "id": "reuters_markets",
+      "name": "Reuters Markets",
+      "url": "https://feeds.reuters.com/reuters/marketsNews",
+      "type": "rss",
+      "trust": 1.0,
+      "lang": "en",
+      "category": "wire"
+    },
+    {
+      "id": "ft_companies",
+      "name": "Financial Times Companies",
+      "url": "https://www.ft.com/companies?format=rss",
+      "type": "rss",
+      "trust": 0.95,
+      "lang": "en",
+      "category": "newspaper"
+    },
+    {
+      "id": "wsj_markets",
+      "name": "Wall Street Journal Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "type": "rss",
+      "trust": 0.95,
+      "lang": "en",
+      "category": "newspaper"
+    },
+    {
+      "id": "bloomberg_search",
+      "name": "Bloomberg via Google News",
+      "url": "https://news.google.com/rss/search?q=site:bloomberg.com+{QUERY}&hl=en-US&gl=US&ceid=US:en",
+      "type": "rss",
+      "trust": 0.92,
+      "lang": "en",
+      "category": "aggregator-bloomberg"
+    },
+    {
+      "id": "cnbc_top",
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "type": "rss",
+      "trust": 0.85,
+      "lang": "en",
+      "category": "tv"
+    },
+    {
+      "id": "marketwatch_top",
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.marketwatch.com/marketwatch/topstories/",
+      "type": "rss",
+      "trust": 0.8,
+      "lang": "en",
+      "category": "newspaper"
+    },
+    {
+      "id": "yahoo_finance",
+      "name": "Yahoo Finance",
+      "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s={SYMBOL}&region=US&lang=en-US",
+      "type": "rss",
+      "trust": 0.75,
+      "lang": "en",
+      "category": "portal",
+      "per_asset": true
+    },
+    {
+      "id": "seeking_alpha",
+      "name": "Seeking Alpha",
+      "url": "https://seekingalpha.com/api/sa/combined/{SYMBOL}.xml",
+      "type": "rss",
+      "trust": 0.65,
+      "lang": "en",
+      "category": "analysis",
+      "per_asset": true
+    },
+    {
+      "id": "tagesschau_wirtschaft",
+      "name": "Tagesschau Wirtschaft",
+      "url": "https://www.tagesschau.de/wirtschaft/index~rss2.xml",
+      "type": "rss",
+      "trust": 0.95,
+      "lang": "de",
+      "category": "tv"
+    },
+    {
+      "id": "handelsblatt_finanzen",
+      "name": "Handelsblatt Finanzen",
+      "url": "https://www.handelsblatt.com/contentexport/feed/finanzen",
+      "type": "rss",
+      "trust": 0.9,
+      "lang": "de",
+      "category": "newspaper"
+    },
+    {
+      "id": "google_news_query",
+      "name": "Google News Query",
+      "url": "https://news.google.com/rss/search?q={QUERY}&hl=en-US&gl=US&ceid=US:en",
+      "type": "rss",
+      "trust": 0.6,
+      "lang": "en",
+      "category": "aggregator",
+      "per_asset": true
+    },
+    {
+      "id": "google_news_query_de",
+      "name": "Google News Query DE",
+      "url": "https://news.google.com/rss/search?q={QUERY}&hl=de&gl=DE&ceid=DE:de",
+      "type": "rss",
+      "trust": 0.6,
+      "lang": "de",
+      "category": "aggregator",
+      "per_asset": true
+    },
+    {
+      "id": "bing_news_query",
+      "name": "Bing News Query",
+      "url": "https://www.bing.com/news/search?q={QUERY}&format=rss",
+      "type": "rss",
+      "trust": 0.55,
+      "lang": "en",
+      "category": "aggregator",
+      "per_asset": true
+    },
+    {
+      "id": "ecb_press",
+      "name": "ECB Press Releases",
+      "url": "https://www.ecb.europa.eu/rss/press.html",
+      "type": "rss",
+      "trust": 1.0,
+      "lang": "en",
+      "category": "central-bank"
+    },
+    {
+      "id": "fed_press",
+      "name": "Federal Reserve Press",
+      "url": "https://www.federalreserve.gov/feeds/press_all.xml",
+      "type": "rss",
+      "trust": 1.0,
+      "lang": "en",
+      "category": "central-bank"
+    },
+    {
+      "id": "sec_8k",
+      "name": "SEC EDGAR 8-K Filings",
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=8-K&dateb=&owner=include&count=40&output=atom",
+      "type": "atom",
+      "trust": 1.0,
+      "lang": "en",
+      "category": "regulator"
+    },
+    {
+      "id": "reddit_wallstreetbets",
+      "name": "Reddit r/wallstreetbets",
+      "url": "https://www.reddit.com/r/wallstreetbets/search.json?q={SYMBOL}&restrict_sr=1&sort=new&t=week",
+      "type": "reddit_json",
+      "trust": 0.35,
+      "lang": "en",
+      "category": "social",
+      "per_asset": true
+    },
+    {
+      "id": "reddit_stocks",
+      "name": "Reddit r/stocks",
+      "url": "https://www.reddit.com/r/stocks/search.json?q={SYMBOL}&restrict_sr=1&sort=new&t=week",
+      "type": "reddit_json",
+      "trust": 0.45,
+      "lang": "en",
+      "category": "social",
+      "per_asset": true
+    },
+    {
+      "id": "reddit_investing",
+      "name": "Reddit r/investing",
+      "url": "https://www.reddit.com/r/investing/search.json?q={SYMBOL}&restrict_sr=1&sort=new&t=week",
+      "type": "reddit_json",
+      "trust": 0.5,
+      "lang": "en",
+      "category": "social",
+      "per_asset": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+# Daten / Logs
+quant_engine/data/*.db
+quant_engine/data/*.db-wal
+quant_engine/data/*.db-shm
+data/*.db
+logs/
+reports/
+
+# Env
+.env
+
+# Editor
+.vscode/
+.idea/
+*.swp

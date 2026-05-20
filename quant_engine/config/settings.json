@@ -1,0 +1,101 @@
+{
+  "asset": {
+    "symbol": "NVDA",
+    "name": "NVIDIA Corporation",
+    "queries": ["NVIDIA", "NVDA", "Nvidia Corp"],
+    "language_priority": ["en", "de"],
+    "yahoo_chart_range": "3mo",
+    "yahoo_chart_interval": "1d"
+  },
+  "sentiment": {
+    "scale": [-100, 100],
+    "recency_lambda_per_hour": 0.0289,
+    "default_source_trust": 0.4,
+    "mention_weight_factor": 0.15,
+    "max_mention_weight": 1.5,
+    "neutral_zone": [-5, 5],
+    "use_vader": true,
+    "use_lexicon": true,
+    "use_finbert": false,
+    "language_lexicon_overrides": {
+      "de": {
+        "positive": ["gewinn", "wachstum", "rekord", "stark", "ueberlegen", "uebertrifft", "optimistisch", "rally", "anstieg"],
+        "negative": ["verlust", "rueckgang", "schwach", "krise", "rezession", "panik", "absturz", "warnung", "sturz", "einbruch"]
+      },
+      "en": {
+        "positive": ["surge", "rally", "beat", "outperform", "record", "growth", "bullish", "upgrade", "strong"],
+        "negative": ["plunge", "crash", "miss", "downgrade", "panic", "recession", "warning", "lawsuit", "loss", "weak"]
+      }
+    }
+  },
+  "momentum": {
+    "velocity_window_hours": 24,
+    "acceleration_window_hours": 24,
+    "ema_alpha": 0.3,
+    "spike_z_threshold": 2.5
+  },
+  "volatility": {
+    "atr_period": 14,
+    "std_window": 20,
+    "beta_benchmark": "^GSPC",
+    "high_vol_threshold_pct": 4.0,
+    "extreme_vol_threshold_pct": 7.0,
+    "panic_threshold": 0.7,
+    "hype_threshold": 0.7
+  },
+  "political_risk": {
+    "severity_weights": {
+      "war": 1.0,
+      "sanctions": 0.9,
+      "tariff": 0.7,
+      "election": 0.5,
+      "regulation": 0.6,
+      "rate_decision": 0.55,
+      "trade_war": 0.85,
+      "embargo": 0.95
+    },
+    "exposure_default": 0.5,
+    "market_sensitivity_default": 0.5,
+    "decay_days": 7
+  },
+  "anomaly": {
+    "rolling_window": 30,
+    "z_threshold": 2.5,
+    "isolation_contamination": 0.05
+  },
+  "forecast": {
+    "horizon_days": 5,
+    "min_history_days": 30,
+    "arima_order": [1, 1, 1],
+    "regressors": ["sentiment_score", "news_volume", "vol_atr", "political_risk"],
+    "rf_estimators": 100
+  },
+  "alerts": {
+    "sentiment_jump": 25,
+    "hype_threshold": 0.75,
+    "panic_threshold": 0.75,
+    "news_spike_z": 3.0,
+    "political_risk_threshold": 60,
+    "volatility_threshold_pct": 5.0,
+    "cooldown_minutes": 30
+  },
+  "cache": {
+    "price_ttl_seconds": 300,
+    "feed_ttl_seconds": 600,
+    "nlp_ttl_seconds": 86400,
+    "max_entries": 2000
+  },
+  "scheduler": {
+    "prices_minutes": 5,
+    "feeds_minutes": 15,
+    "analysis_minutes": 10,
+    "discovery_hours": 24
+  },
+  "http": {
+    "timeout_seconds": 20,
+    "max_concurrent_requests": 8,
+    "retries": 2,
+    "retry_backoff_seconds": 1.5,
+    "user_agent": "QuantEngine/0.1 (open-source research bot)"
+  }
+}
