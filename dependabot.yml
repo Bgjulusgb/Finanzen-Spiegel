@@ -1,0 +1,59 @@
+name: Bug Report
+description: Einen Fehler melden
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke fuer deinen Bug-Report. Bitte fuelle die Felder so vollstaendig wie moeglich aus.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung
+      description: Was ist das Problem?
+      placeholder: Die App stuerzt ab wenn ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Reproduzieren
+      placeholder: |
+        1. Oeffne '...'
+        2. Klicke auf '...'
+        3. Fehler tritt auf
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was sollte stattdessen passieren?
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Betriebssystem
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Sonstiges
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: v2.0.0
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Logs aus `logs/` einfuegen
+      render: shell

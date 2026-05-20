@@ -1,0 +1,151 @@
+{
+  "name": "pressespiegel-kammerspiele",
+  "version": "2.0.0",
+  "description": "Lokales Pressespiegel-Tool fuer die Muenchner Kammerspiele - Desktop-App mit UI, alles offline",
+  "main": "electron/main.js",
+  "bin": {
+    "pressespiegel": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "ui": "node bin/cli.js ui",
+    "electron": "electron .",
+    "electron:dev": "ELECTRON_DEV=1 electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "build:linux": "electron-builder --linux --x64",
+    "build:mac": "electron-builder --mac --x64 --arm64",
+    "build:all": "electron-builder -mwl",
+    "scan": "node bin/cli.js scan",
+    "report": "node bin/cli.js report",
+    "schedule": "node bin/cli.js schedule",
+    "stats": "node bin/cli.js stats",
+    "test": "node --test tests/*.test.js",
+    "test:watch": "node --test --watch tests/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/*.test.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md,yml,yaml}\"",
+    "doctor": "node scripts/doctor.js"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "keywords": [
+    "pressespiegel",
+    "press-monitoring",
+    "kammerspiele",
+    "muenchen",
+    "scraping",
+    "rss",
+    "electron",
+    "desktop"
+  ],
+  "author": "Muenchner Kammerspiele",
+  "license": "MIT",
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "axios": "^1.16.1",
+    "chalk": "^4.1.2",
+    "cheerio": "^1.2.0",
+    "commander": "^14.0.3",
+    "date-fns": "^4.2.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "franc-min": "^6.2.0",
+    "fuse.js": "^7.3.0",
+    "he": "^1.2.0",
+    "iconv-lite": "^0.7.2",
+    "js-levenshtein": "^1.1.6",
+    "jsdom": "^29.1.1",
+    "keyword-extractor": "^0.0.28",
+    "lru-cache": "^11.5.0",
+    "natural": "^8.1.1",
+    "node-cron": "^4.2.1",
+    "p-limit": "^3.1.0",
+    "puppeteer": "^25.0.4",
+    "rss-parser": "^3.13.0",
+    "undici": "^8.3.0",
+    "winston": "^3.19.0",
+    "ws": "^8.20.1",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1",
+    "eslint": "^10.4.0",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3"
+  },
+  "build": {
+    "appId": "de.kammerspiele.pressespiegel",
+    "productName": "Pressespiegel Kammerspiele",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "bin/**/*",
+      "web/**/*",
+      "config/**/*",
+      "package.json",
+      "!data/**/*",
+      "!logs/**/*",
+      "!reports/**/*",
+      "!tests/**/*",
+      "!dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "config",
+        "to": "config"
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/puppeteer/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Pressespiegel-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pressespiegel Kammerspiele"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Office"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity"
+    }
+  }
+}

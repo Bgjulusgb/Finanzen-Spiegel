@@ -1,0 +1,322 @@
+{
+  "_comment": "Auto-Tagging-Regeln. Tags werden waehrend des Scans angewendet, wenn ein Artikel die Bedingungen erfuellt.",
+  "categories": {
+    "produktion": "Aktuelle Produktion auf dem Spielplan",
+    "person": "Erwaehnte Person (Ensemble, Regie, Leitung)",
+    "venue": "Spielstaette",
+    "ereignis": "Artikeltyp / Ereignis",
+    "thema": "Thematische Einordnung",
+    "tonalitaet": "Stimmung der Berichterstattung",
+    "relevanz": "Bedeutung des Artikels",
+    "form": "Journalistische Form"
+  },
+  "rules": [
+    {
+      "tag": "produktion:wallenstein",
+      "category": "produktion",
+      "match_text": ["Wallenstein"],
+      "min_required": ["Kammerspiele"]
+    },
+    {
+      "tag": "produktion:pinocchio",
+      "category": "produktion",
+      "match_text": ["Pinocchio"],
+      "min_required": ["Kammerspiele", "Wu Tsang"]
+    },
+    {
+      "tag": "produktion:mephisto",
+      "category": "produktion",
+      "match_text": ["Mephisto"],
+      "min_required": ["Kammerspiele"]
+    },
+    {
+      "tag": "produktion:wokey-wokey",
+      "category": "produktion",
+      "match_text": ["Wokey Wokey", "Abdel-Maksoud"]
+    },
+    {
+      "tag": "produktion:eurydike-orpheus",
+      "category": "produktion",
+      "match_text": ["Eurydike und Orpheus", "Eurydike", "Smolar"],
+      "min_required": ["Kammerspiele"]
+    },
+    {
+      "tag": "produktion:tristan",
+      "category": "produktion",
+      "match_text": ["Tristan und Isolde", "Tristan"],
+      "min_required": ["Kammerspiele"]
+    },
+    {
+      "tag": "produktion:was-ihr-wollt",
+      "category": "produktion",
+      "match_text": ["Was ihr wollt"],
+      "min_required": ["Kammerspiele"]
+    },
+    {
+      "tag": "produktion:prachttier",
+      "category": "produktion",
+      "match_text": ["Prachttier", "Mein kleines Prachttier"]
+    },
+    {
+      "tag": "produktion:love-me-tender",
+      "category": "produktion",
+      "match_text": ["Love me tender"],
+      "min_required": ["Brucker", "Kammerspiele"]
+    },
+    { "tag": "produktion:enjoy-schatz", "category": "produktion", "match_text": ["Enjoy Schatz"] },
+    {
+      "tag": "produktion:meister-margarita",
+      "category": "produktion",
+      "match_text": ["Meister und Margarita", "Meister Margarita"]
+    },
+    {
+      "tag": "produktion:fraeulein-else",
+      "category": "produktion",
+      "match_text": ["Fräulein Else", "Fraeulein Else"]
+    },
+    {
+      "tag": "produktion:fremd",
+      "category": "produktion",
+      "match_text": ["\"Fremd\""],
+      "min_required": ["Kammerspiele"]
+    },
+    {
+      "tag": "produktion:bevor-ich-vergesse",
+      "category": "produktion",
+      "match_text": ["Bevor ich es vergesse"]
+    },
+    {
+      "tag": "produktion:play-auerbach",
+      "category": "produktion",
+      "match_text": ["Play Auerbach", "Philipp Auerbach"]
+    },
+    {
+      "tag": "produktion:very-rich-angels",
+      "category": "produktion",
+      "match_text": ["Very Rich Angels"]
+    },
+    {
+      "tag": "produktion:wachse-oder-weiche",
+      "category": "produktion",
+      "match_text": ["Wachse oder weiche", "Schafroth"]
+    },
+
+    { "tag": "person:mundel", "category": "person", "match_text": ["Barbara Mundel"] },
+    { "tag": "person:veldhoen", "category": "person", "match_text": ["Daniel Veldhoen"] },
+    { "tag": "person:hasselberg", "category": "person", "match_text": ["Viola Hasselberg"] },
+    { "tag": "person:puls", "category": "person", "match_text": ["Wiebke Puls"] },
+    { "tag": "person:hess", "category": "person", "match_text": ["Walter Hess"] },
+    { "tag": "person:koch", "category": "person", "match_text": ["Samuel Koch"] },
+    { "tag": "person:schmauser", "category": "person", "match_text": ["Thomas Schmauser"] },
+    { "tag": "person:paulmann", "category": "person", "match_text": ["Annette Paulmann"] },
+    { "tag": "person:wilke", "category": "person", "match_text": ["Lucy Wilke"] },
+    {
+      "tag": "person:woellisch",
+      "category": "person",
+      "match_text": ["Luisa Wöllisch", "Luisa Woellisch"]
+    },
+    { "tag": "person:merki", "category": "person", "match_text": ["Stefan Merki"] },
+    {
+      "tag": "person:telgenkaemper",
+      "category": "person",
+      "match_text": ["Telgenkämper", "Telgenkaemper"]
+    },
+    { "tag": "person:kuljic", "category": "person", "match_text": ["Kuljić", "Kuljic"] },
+    { "tag": "person:tsang", "category": "person", "match_text": ["Wu Tsang"] },
+    {
+      "tag": "person:abdel-maksoud",
+      "category": "person",
+      "match_text": ["Nora Abdel-Maksoud", "Abdel-Maksoud"]
+    },
+    { "tag": "person:brucker", "category": "person", "match_text": ["Felicitas Brucker"] },
+    { "tag": "person:smolar", "category": "person", "match_text": ["Anna Smolar"] },
+    { "tag": "person:boehm", "category": "person", "match_text": ["Leonie Böhm", "Leonie Boehm"] },
+    { "tag": "person:schafroth", "category": "person", "match_text": ["Maxi Schafroth"] },
+    { "tag": "person:kohm", "category": "person", "match_text": ["Sarah Kohm"] },
+    {
+      "tag": "person:lilienthal",
+      "category": "person",
+      "match_text": ["Matthias Lilienthal", "Lilienthal"]
+    },
+    { "tag": "person:held", "category": "person", "match_text": ["Alexander Held"] },
+    {
+      "tag": "person:halmer",
+      "category": "person",
+      "match_text": ["Günther Maria Halmer", "Halmer"]
+    },
+
+    { "tag": "venue:schauspielhaus", "category": "venue", "match_text": ["Schauspielhaus"] },
+    { "tag": "venue:werkraum", "category": "venue", "match_text": ["Werkraum"] },
+    {
+      "tag": "venue:therese-giehse-halle",
+      "category": "venue",
+      "match_text": ["Therese-Giehse-Halle", "Therese Giehse"]
+    },
+    { "tag": "venue:habibi-kiosk", "category": "venue", "match_text": ["Habibi Kiosk"] },
+    {
+      "tag": "venue:maximilianstrasse",
+      "category": "venue",
+      "match_text": ["Maximilianstrasse", "Maximilianstraße"]
+    },
+
+    {
+      "tag": "ereignis:premiere",
+      "category": "ereignis",
+      "match_text": ["Premiere", "Erstauffuehrung", "Erstaufführung", "Uraufführung"]
+    },
+    { "tag": "ereignis:gastspiel", "category": "ereignis", "match_text": ["Gastspiel"] },
+    {
+      "tag": "ereignis:theatertreffen",
+      "category": "ereignis",
+      "match_text": [
+        "Theatertreffen",
+        "Berliner Theatertreffen",
+        "Muelheimer Theatertage",
+        "Mülheimer Theatertage"
+      ]
+    },
+    {
+      "tag": "ereignis:spielzeit-start",
+      "category": "ereignis",
+      "match_text": [
+        "neue Spielzeit",
+        "Spielzeiteröffnung",
+        "Saisoneroeffnung",
+        "Spielplan vorgestellt"
+      ]
+    },
+    {
+      "tag": "ereignis:auszeichnung",
+      "category": "ereignis",
+      "match_text": ["Preis", "Auszeichnung", "Theaterpreis", "ausgezeichnet"]
+    },
+    {
+      "tag": "ereignis:nachruf",
+      "category": "ereignis",
+      "match_text": ["gestorben", "verstorben", "Nachruf", "im Alter von", "tot"]
+    },
+    {
+      "tag": "ereignis:debatte",
+      "category": "ereignis",
+      "match_text": ["Skandal", "Kontroverse", "Protest", "Debatte", "Eklat"]
+    },
+    {
+      "tag": "ereignis:finanzen",
+      "category": "ereignis",
+      "match_text": [
+        "Sparprogramm",
+        "Kuerzung",
+        "Kürzung",
+        "Haushalt",
+        "Etat",
+        "Subvention",
+        "Foerderung",
+        "Förderung"
+      ]
+    },
+    {
+      "tag": "ereignis:personalie",
+      "category": "ereignis",
+      "match_text": [
+        "Intendanten-Wechsel",
+        "neue Intendant",
+        "wird neuer",
+        "uebernimmt die Leitung",
+        "verlaesst",
+        "Vertragsverlaengerung"
+      ]
+    },
+
+    {
+      "tag": "form:kritik",
+      "category": "form",
+      "match_text": ["Kritik", "Rezension", "Besprechung", "Verriss", "Lobpreisung"]
+    },
+    {
+      "tag": "form:interview",
+      "category": "form",
+      "match_text": ["Interview", "im Gespraech", "im Gespräch", "Frage:", "Antwort:"]
+    },
+    {
+      "tag": "form:portraet",
+      "category": "form",
+      "match_text": ["Portraet", "Porträt", "Portrait"]
+    },
+    {
+      "tag": "form:reportage",
+      "category": "form",
+      "match_text": ["Reportage", "Hintergrundbericht"]
+    },
+    {
+      "tag": "form:essay",
+      "category": "form",
+      "match_text": ["Essay", "Kolumne", "Glosse", "Kommentar"]
+    },
+    { "tag": "form:meldung", "category": "form", "match_text": ["Meldung", "dpa", "AFP"] },
+
+    {
+      "tag": "thema:politisch",
+      "category": "thema",
+      "match_text": ["politisch", "Politik", "Aktivismus", "Diskurs"]
+    },
+    {
+      "tag": "thema:queer",
+      "category": "thema",
+      "match_text": ["queer", "LGBTQ", "trans", "Homosexualitaet", "Geschlecht"]
+    },
+    {
+      "tag": "thema:klima",
+      "category": "thema",
+      "match_text": ["Klima", "Nachhaltigkeit", "Umwelt"]
+    },
+    {
+      "tag": "thema:migration",
+      "category": "thema",
+      "match_text": ["Migration", "Flucht", "Postmigrant"]
+    },
+    {
+      "tag": "thema:digital",
+      "category": "thema",
+      "match_text": ["digital", "Streaming", "Online-Theater", "Hybrid"]
+    },
+    {
+      "tag": "thema:inklusion",
+      "category": "thema",
+      "match_text": ["Inklusion", "barrierefrei", "Behinderung"]
+    },
+    {
+      "tag": "thema:klassiker",
+      "category": "thema",
+      "match_text": ["Schiller", "Goethe", "Shakespeare", "Klassiker"]
+    },
+    {
+      "tag": "thema:musik",
+      "category": "thema",
+      "match_text": ["Konzert", "Band", "Musiker", "Komponist"]
+    },
+
+    { "tag": "tonalitaet:positiv", "category": "tonalitaet", "if_sentiment": "positiv" },
+    { "tag": "tonalitaet:negativ", "category": "tonalitaet", "if_sentiment": "negativ" },
+    { "tag": "tonalitaet:neutral", "category": "tonalitaet", "if_sentiment": "neutral" },
+
+    { "tag": "relevanz:top", "category": "relevanz", "if_category": "sehr_relevant" },
+    { "tag": "relevanz:hoch", "category": "relevanz", "if_category": "relevant" },
+
+    { "tag": "qualitaet:paywall", "category": "form", "if_paywall": true },
+    {
+      "tag": "qualitaet:dpa",
+      "category": "form",
+      "match_text": ["(dpa)", "Muenchen (dpa)", "München (dpa)"]
+    }
+  ],
+  "category_colors": {
+    "produktion": "#2563eb",
+    "person": "#7c3aed",
+    "venue": "#0891b2",
+    "ereignis": "#d97706",
+    "thema": "#059669",
+    "tonalitaet": "#475569",
+    "relevanz": "#dc2626",
+    "form": "#64748b"
+  }
+}

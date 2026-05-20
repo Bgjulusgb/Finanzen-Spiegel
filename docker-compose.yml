@@ -1,0 +1,28 @@
+services:
+  pressespiegel:
+    build: .
+    image: pressespiegel:latest
+    container_name: pressespiegel
+    ports:
+      - '4711:4711'
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./config:/app/config
+    environment:
+      - NODE_ENV=production
+      - PRESSESPIEGEL_PORT=4711
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4711/api/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
