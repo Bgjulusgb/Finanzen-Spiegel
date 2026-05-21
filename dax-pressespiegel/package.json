@@ -1,24 +1,23 @@
 {
   "name": "dax-pressespiegel",
-  "version": "0.1.0",
-  "description": "Lokaler Stimmungs-Pressespiegel fuer den DAX 40 - Artikel sammeln, Aktien-Erwaehnungen finden, Sentiment je Aktie auswerten.",
+  "version": "0.3.0",
+  "description": "Lokaler Stimmungs-Pressespiegel fuer den DAX 40 - Mood, Bull/Bear, Talk-Type, Buzz, Trend, Konsens. Zero native compilation: nutzt das in Node eingebaute node:sqlite.",
   "main": "src/server.js",
   "bin": {
     "dax-pressespiegel": "./bin/cli.js"
   },
   "scripts": {
-    "start": "node bin/cli.js ui",
-    "ui": "node bin/cli.js ui",
-    "scan": "node bin/cli.js scan",
-    "list": "node bin/cli.js list",
-    "inspect": "node scripts/inspect.js",
-    "test": "node --test tests/*.test.js"
+    "start": "node --experimental-sqlite --no-warnings=ExperimentalWarning bin/cli.js ui",
+    "ui": "node --experimental-sqlite --no-warnings=ExperimentalWarning bin/cli.js ui",
+    "scan": "node --experimental-sqlite --no-warnings=ExperimentalWarning bin/cli.js scan",
+    "list": "node --experimental-sqlite --no-warnings=ExperimentalWarning bin/cli.js list",
+    "inspect": "node --experimental-sqlite --no-warnings=ExperimentalWarning scripts/inspect.js",
+    "test": "node --experimental-sqlite --no-warnings=ExperimentalWarning --test tests/*.test.js"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.5.0"
   },
   "dependencies": {
-    "better-sqlite3": "^11.7.0",
     "cheerio": "^1.0.0",
     "express": "^4.21.2",
     "rss-parser": "^3.13.0",

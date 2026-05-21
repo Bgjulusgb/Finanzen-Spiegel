@@ -159,3 +159,48 @@ test('analyzer: Intensifier verstaerkt Sentiment', () => {
   const strong = scoreSentiment('SAP zeigt sehr starken Gewinn.', 'de');
   assert.ok(strong.polarity >= plain.polarity);
 });
+
+// ---------- v0.3 ----------
+
+test('analyzer: Disambiguierung - laengster Treffer gewinnt', () => {
+  // Mercedes-Benz Group muss exklusiv MBG.DE matchen, nicht zusaetzlich
+  // ein hypothetisches "Mercedes"-Pattern doppelt anziehen.
+  const m = findStockMentions('', 'Mercedes-Benz Group senkt Prognose.');
+  assert.ok(m['MBG.DE']);
+  assert.equal(m['MBG.DE'].mentions, 1);
+});
+
+test('analyzer: ISIN-Treffer wird erkannt und als id_hit markiert', () => {
+  // SAP ISIN: DE0007164600
+  const m = findStockMentions('', 'Hinweis zur Anleihe DE0007164600 von der Walldorfer Software-Schmiede.');
+  assert.ok(m['SAP.DE']);
+  assert.equal(m['SAP.DE'].id_hit, true);
+});
+
+test('analyzer: Symbol-Treffer wird erkannt (z.B. SAP.DE)', () => {
+  const m = findStockMentions('Top-Pick: SAP.DE', '');
+  assert.ok(m['SAP.DE']);
+  assert.equal(m['SAP.DE'].id_hit, true);
+  assert.equal(m['SAP.DE'].title_hit, true);
+});
+
+test('analyzer: Title-Heavy - Titel-Sentiment dominiert Body', () => {
+  // Titel stark negativ, Body neutral -> Gesamt sollte deutlich negativ sein.
+  const r = analyzeArticle({
+    title: 'Volkswagen mit Gewinnwarnung und Klage',
+    summary: 'Der Konzern teilte am Mittwoch mit, dass die Hauptversammlung verschoben wurde.',
+    lang: 'de',
+  });
+  assert.ok(r.overall.polarity < -0.3, `Sollte stark negativ sein (Title-Heavy), war ${r.overall.polarity}`);
+  assert.ok(r.overall.title_polarity < r.overall.polarity + 0.01, 'title_polarity muss separat bereitgestellt werden');
+});
+
+test('analyzer: ohne Wertungstreffer ist Polaritaet 0 und Label neutral', () => {
+  const r = analyzeArticle({
+    title: 'SAP Hauptversammlung',
+    summary: 'Termin bekanntgegeben.',
+    lang: 'de',
+  });
+  assert.equal(r.overall.polarity, 0);
+  assert.equal(r.overall.label, 'neutral');
+});

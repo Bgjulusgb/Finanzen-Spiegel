@@ -9,43 +9,73 @@ function compileStockMatchers(stocks = DAX) {
   return stocks.map((s) => {
     const terms = [...new Set([...s.queries, ...(s.synonyms || [])])]
       .map((t) => t.trim()).filter(Boolean);
+    // Laengste Suchbegriffe zuerst -> "Mercedes-Benz Group" gewinnt vor "Mercedes".
     const escaped = terms.map(escapeRegex).sort((a, b) => b.length - a.length);
     const pattern = new RegExp(`(?<![\\p{L}\\d])(?:${escaped.join('|')})(?![\\p{L}\\d])`, 'giu');
-    return { stock: s, pattern, terms };
+    // Optional: negative_terms blockieren Treffer.
+    const negTerms = s.negative_terms || [];
+    const negPattern = negTerms.length
+      ? new RegExp(`(?<![\\p{L}\\d])(?:${negTerms.map(escapeRegex).join('|')})(?![\\p{L}\\d])`, 'giu')
+      : null;
+    // ISIN + Ticker als Bonus-Pattern (case-sensitive, eindeutige Identifikatoren).
+    const idTokens = [s.symbol];
+    if (s.isin) idTokens.push(s.isin);
+    const idPattern = new RegExp(`(?<![\\p{L}\\d])(?:${idTokens.map(escapeRegex).join('|')})(?![\\p{L}\\d])`, 'g');
+    return { stock: s, pattern, negPattern, idPattern, terms };
   });
 }
 
 const STOCK_MATCHERS = compileStockMatchers();
 
+// Disambiguierung: alle Treffer ueber alle Aktien sammeln, dann pro
+// Char-Position den laengsten Treffer gewinnen lassen. Verhindert dass z.B.
+// "Mercedes-Benz Group" sowohl bei MBG.DE als auch bei einem hypothetischen
+// "Mercedes"-Eintrag matched.
 function findStockMentions(title, body) {
   const titleTxt = String(title || '');
   const bodyTxt = String(body || '');
   const combined = titleTxt + '\n' + bodyTxt;
-  const out = {};
-  for (const { stock, pattern } of STOCK_MATCHERS) {
-    pattern.lastIndex = 0;
-    const matches = combined.match(pattern);
-    if (!matches || matches.length === 0) continue;
-    pattern.lastIndex = 0;
-    const titleMatch = pattern.test(titleTxt);
-    pattern.lastIndex = 0;
+  const titleEnd = titleTxt.length;
 
-    // Positionen aller Treffer (ueber kombinierten Text) sammeln,
-    // damit Aspekt-Fenster spaeter berechnet werden kann.
-    const positions = [];
-    let m;
-    pattern.lastIndex = 0;
-    while ((m = pattern.exec(combined)) !== null) {
-      positions.push(m.index);
-      if (m.index === pattern.lastIndex) pattern.lastIndex++;
+  // Phase 1: pro Aktie alle Hits + ID-Hits einsammeln.
+  const raw = []; // {symbol, start, length, isTitle, isId}
+  for (const { stock, pattern, negPattern, idPattern } of STOCK_MATCHERS) {
+    if (negPattern) {
+      negPattern.lastIndex = 0;
+      if (negPattern.test(combined)) continue;
     }
     pattern.lastIndex = 0;
+    let m;
+    while ((m = pattern.exec(combined)) !== null) {
+      raw.push({ symbol: stock.symbol, start: m.index, length: m[0].length, isTitle: m.index < titleEnd, isId: false });
+      if (m.index === pattern.lastIndex) pattern.lastIndex++;
+    }
+    idPattern.lastIndex = 0;
+    while ((m = idPattern.exec(combined)) !== null) {
+      raw.push({ symbol: stock.symbol, start: m.index, length: m[0].length, isTitle: m.index < titleEnd, isId: true });
+      if (m.index === idPattern.lastIndex) idPattern.lastIndex++;
+    }
+  }
+  if (raw.length === 0) return {};
 
-    out[stock.symbol] = {
-      mentions: matches.length,
-      title_hit: titleMatch,
-      positions,
-    };
+  // Phase 2: bei Ueberschneidungen den laengsten Treffer behalten.
+  raw.sort((a, b) => a.start - b.start || b.length - a.length);
+  const kept = [];
+  let occupiedUntil = -1;
+  for (const h of raw) {
+    if (h.start < occupiedUntil) continue; // ueberlappt mit vorherigem (laengeren) Treffer
+    kept.push(h);
+    occupiedUntil = h.start + h.length;
+  }
+
+  // Phase 3: aggregieren pro Symbol.
+  const out = {};
+  for (const h of kept) {
+    if (!out[h.symbol]) out[h.symbol] = { mentions: 0, title_hit: false, id_hit: false, positions: [] };
+    out[h.symbol].mentions += 1;
+    if (h.isTitle) out[h.symbol].title_hit = true;
+    if (h.isId) out[h.symbol].id_hit = true;
+    out[h.symbol].positions.push(h.start);
   }
   return out;
 }
@@ -286,16 +316,43 @@ function classifyTalkType(text) {
 
 // ---------- Combined article analysis ----------
 
+// Titel- und Body-Sentiment getrennt scoren, dann gewichtet zusammenfuehren.
+// Headlines sind verdichteter und repraesentativer.
+function blendTitleBody(titleR, bodyR, titleWeight = 0.7) {
+  // Wenn der Titel keine Wertungstreffer hat, faellt das Mischen auf den Body zurueck.
+  if (titleR.hits === 0 && bodyR.hits === 0) {
+    return { polarity: 0, bull_score: 0, intensity: 0, hits: 0,
+             label: 'neutral', bull_label: 'neutral', pos_hits: 0, neg_hits: 0 };
+  }
+  if (titleR.hits === 0) return bodyR;
+  if (bodyR.hits === 0)  return titleR;
+  const tw = titleWeight, bw = 1 - titleWeight;
+  const polarity = titleR.polarity * tw + bodyR.polarity * bw;
+  const bull_score = titleR.bull_score * tw + bodyR.bull_score * bw;
+  const intensity = titleR.intensity * tw + bodyR.intensity * bw;
+  return {
+    polarity, bull_score, intensity,
+    hits: titleR.hits + bodyR.hits,
+    label: moodLabel(polarity),
+    bull_label: bullLabel(bull_score),
+    pos_hits: polarity > 0 ? (titleR.hits + bodyR.hits) : 0,
+    neg_hits: polarity < 0 ? (titleR.hits + bodyR.hits) : 0,
+  };
+}
+
 function analyzeArticle({ title, summary, lang = 'de' }) {
   const titleTxt = String(title || '');
   const bodyTxt  = String(summary || '');
   const combined = titleTxt + '\n' + bodyTxt;
 
-  // Gesamttext-Sentiment.
-  const overall = scoreSentiment(combined, lang);
+  // Titel und Body getrennt scoren, dann blenden (Title-Heavy).
+  const titleR = scoreSentiment(titleTxt, lang);
+  const bodyR  = scoreSentiment(bodyTxt, lang);
+  const overall = blendTitleBody(titleR, bodyR, 0.7);
+
   // Talk-Type aus Volltext.
   const talk = classifyTalkType(combined);
-  // Stock-Erwaehnungen.
+  // Stock-Erwaehnungen mit Disambiguierung.
   const mentions = findStockMentions(titleTxt, bodyTxt);
 
   // Pro Aktie zusaetzliches Aspekt-Sentiment (Worte direkt drumherum).
@@ -312,6 +369,10 @@ function analyzeArticle({ title, summary, lang = 'de' }) {
       hits: overall.hits,
       label: overall.label,
       bull_label: overall.bull_label,
+      pos_hits: overall.pos_hits,
+      neg_hits: overall.neg_hits,
+      title_polarity: titleR.polarity,
+      title_bull: titleR.bull_score,
     },
     talk,
     mentions,

@@ -1,113 +1,158 @@
-# Verbesserungs-Plan v0.2 — DAX 40 Pressespiegel
+# Verbesserungs-Plan v0.3 — DAX 40 Pressespiegel
 
 Stand: 2026-05-21
 
-Ausgangslage v0.1 hatte ein einfaches polaritaets-basiertes Sentiment.
-Das ist zu duenn, um zu sagen *"wie wird ueber die Aktie geredet"*.
+Treiber dieser Iteration:
+1. Windows-Install scheiterte an `better-sqlite3` (braucht MSVC-Compilation).
+2. Dependencies sollten auf die neuesten Versionen.
+3. Suche / Bewertung / Filterung / Auswertung im Detail verbessern.
 
-## Ziele
+## 1. Plattform / Setup auf neuesten Stand
 
-1. Aus jedem Artikel **mehrere unabhaengige Signale** extrahieren statt nur ±Polaritaet.
-2. Quellen-Mix robuster machen (weniger 403/404 in der Praxis).
-3. UI zeigt klar: **Bullisch / Bearisch**, **Buzz**, **Talk-Type**, **Konsens vs. Streit**.
-4. Aktien-Erwaehnungen sind **kontext-sensitiv** bewertet (Worte unmittelbar um die
-   Aktie zaehlen mehr als Worte am Artikelende).
+### Zero-Native-Compilation
 
-## Neue Signal-Dimensionen pro Artikel
+Statt `better-sqlite3` jetzt `node:sqlite` (in Node selbst eingebaut, seit
+v22.5 als `--experimental-sqlite`, stabil ab v24). Vorteile:
+- keine MSVC / node-gyp / Python-Build-Tools mehr noetig
+- Installation per `npm install` ist sekundenschnell
+- gleiche synchron-API wie better-sqlite3, kleine Anpassungen noetig
+- groesste SQLite-Pflege schon im Node-Core (Updates automatisch)
 
-| Signal           | Skala        | Interpretation                                                                 |
-| ---------------- | ------------ | ------------------------------------------------------------------------------ |
-| `polarity`       | -1 .. +1     | klassisch: positiv / negativ                                                   |
-| `bull_score`     | -1 .. +1     | bullisch (Kaufgrund, Kursziel hoch, kaufen) vs. bearisch (Verkauf, Short, Crash) |
-| `talk_type`      | enum         | `earnings`, `mna`, `legal`, `analyst`, `product`, `macro`, `scandal`, `general` |
-| `intensity`      | 0 .. 1       | wie aufgeladen ist der Text (Anteil starker Wertungswoerter)                   |
-| `aspect_polarity`| -1 .. +1     | Sentiment **im 12-Wort-Fenster um die Aktie**, nicht im ganzen Text            |
+### Dependencies geupdated
 
-## Neue Aggregate pro Aktie
+| Paket        | alt        | neu     | Grund                                       |
+| ------------ | ---------- | ------- | ------------------------------------------- |
+| better-sqlite3 | 11.7    | **entfernt** | durch node:sqlite ersetzt              |
+| express      | 4.21       | 5.x     | aktuelle Major; unsere API ist v5-kompatibel |
+| undici       | 7.2        | 7.x neueste | HTTP-Client                              |
+| rss-parser   | 3.13       | 3.13.x neueste | wenig Bewegung                          |
+| cheerio      | 1.0        | 1.x neueste | Article-Parsing                            |
 
-| Metrik           | Berechnung                                                            |
-| ---------------- | --------------------------------------------------------------------- |
-| `mood_100`       | gewichteter Mittelwert von `polarity` (-100..+100)                    |
-| `bull_bear_100`  | gewichteter Mittelwert von `bull_score` (-100..+100)                  |
-| `buzz`           | Artikelzahl relativ zum Median ueber alle 40 Aktien (1.0 = Median)    |
-| `consensus`      | 1 - Streuung des Sentiments (1 = einhellig, 0 = volatil)              |
-| `trend_delta`    | mood_100 letzte 3 Tage - mood_100 davor                               |
-| `top_talk_type`  | haeufigster `talk_type` im Fenster                                    |
+### engines.node
 
-## Bull/Bear-Lexikon (DE/EN, gewichtet)
+`>=22.5.0`. Vorher war `>=20`, aber `node:sqlite` braucht Node 22.5+.
 
-Nicht jedes Wort gleich stark. Beispiele:
-- "Kursziel angehoben" = +0.8 bullisch, +0.6 polarity
-- "Kaufempfehlung" = +1.0 bullisch
-- "Gewinnwarnung" = -1.0 bullisch, -0.9 polarity
-- "Klage" = -0.6 bullisch, -0.5 polarity
-- "Rekordauftrag" = +0.8 bullisch, +0.7 polarity
-- "Squeeze-Out" = +0.5 bullisch
-- "Insolvenz" = -1.0 bullisch, -1.0 polarity
-- "Streik" = -0.3 bullisch, -0.4 polarity
+---
 
-Gewichte werden additiv pro Treffer angesetzt, dann durch Trefferzahl normalisiert.
+## 2. Suche verbessern
 
-## Talk-Type-Klassifikation
+### Mehr-Aktien-Disambiguierung
+Porsche AG (P911.DE) vs. Porsche SE (PAH3.DE), Mercedes-Benz Group (MBG.DE)
+vs. Daimler Truck (DTG.DE): wenn beide matchen wuerden, gewinnt der
+laengste Treffer pro Position; Kollisionen werden nicht doppelt gezaehlt.
 
-Regelbasiert, Trigger-Phrasen pro Klasse:
-- `earnings`: "Q1", "Q2", "Q3", "Q4", "Quartalszahlen", "Gewinn vor", "Umsatz steigt", "EPS"
-- `mna`: "Uebernahme", "kauft", "Fusion", "Merger", "Tender", "Synergie"
-- `legal`: "Klage", "Urteil", "Vergleich", "Geldstrafe", "Ermittlung", "Razzia"
-- `analyst`: "Kursziel", "Bewertung", "Rating", "Buy/Sell/Hold", "Analyst"
-- `product`: "Launch", "stellt vor", "neues Modell", "Markteinfuehrung"
-- `macro`: "Leitzins", "EZB", "Fed", "Inflation", "Rezession", "Konjunktur"
-- `scandal`: "Betrug", "Korruption", "Manipulation", "Skandal", "Rueckruf"
-- `general`: Fallback
+### Mehrwort-Phrasen prioritaer
+"Munich Re" muss zuerst probiert werden, bevor "Hannover Rueck" oder andere
+Substring-Matches greifen. Lexikon ist schon laengsten-zuerst sortiert,
+Stock-Matcher auch (siehe `compileStockMatchers`).
 
-## Aspekt-Sentiment (Kontextfenster)
+### Ticker- und ISIN-Erkennung
+Wenn ein Artikel `DE0007164600` oder `SAP.DE` direkt nennt, ist das ein
+sehr starkes Signal. Wir matchen zusaetzlich ISIN/Ticker exakt
+(case-sensitive), und geben dem Treffer einen Mention-Boost.
 
-Statt nur den Artikel-Gesamttext zu scoren, suchen wir **±12 Worte um die Aktien-Erwaehnung**
-und scoren dieses Fenster. Wirkt gegen Artikel, in denen 5 Aktien gemeinsam genannt werden,
-aber unterschiedlich bewertet sind.
+### Stoppen bei Negativ-Aktien-Worten
+Falls "Mercedes Sosa" (Saengerin) genannt wird, sollte das nicht als
+Mercedes-Benz zaehlen. Pro Aktie eine optionale `negative_terms`-Liste.
 
-## Fetching-Verbesserungen
+### Snippet-Erweiterung
+Aktuell wird nur `<title> + <summary>` der RSS-Items gescannt. Bei vielen
+Feeds ist `summary` leer / kuerzer. Optional: bei einem schwachen Treffer
+(kein Title-Hit, niedriger Aspekt-Sentiment-Bias) eine zweite Anfrage auf
+den Artikel-Body holen und mitscoren. Standard-Aus, per Setting aktivierbar.
 
-Aktueller Stand: viele dt. Verlage liefern HTTP 403, weil sie Bot-User-Agents blocken.
+---
 
-Massnahmen:
-- realistischer Browser-User-Agent (Mozilla Firefox-Latest), nicht der Pseudo-Bot
-- `Accept: ... ; q=...` Header voll setzen
-- pro Request 1 Retry mit 1s Backoff
-- mehrere alternative Feed-URLs pro Quelle (z.B. mehrere Endpoints von Handelsblatt)
-- Atom + RSS + JSON-Feed alle akzeptieren
-- zusaetzliche Quellen die zuverlaessig liefern:
-  - Yahoo Finance RSS pro Aktie
-  - DGAP / EQS Adhoc-News
-  - Boersengefluester
-  - Aktien.guide RSS
-  - Trading-Economics-Calendar nicht relevant fuer Sentiment
-  - Reddit r/MauerstrassenWetten + r/Aktien (RSS-Endpoint von Reddit)
+## 3. Bewertung verbessern
 
-## UI-Verbesserungen
+### Title-Heavy Scoring
+Headlines sind verdichteter und repraesentativer als Snippets. Aktuell
+title_hit gibt nur +0.2 zur Gewichtung. Neu: separater
+`title_polarity` + `title_bull` Score (Sentiment NUR im Titel berechnen),
+gemittelt mit dem Body-Sentiment im Verhaeltnis 0.7 : 0.3.
 
-Auf der Karte zusaetzlich:
-- **2 Badges** statt 1: links MOOD, rechts BULL/BEAR
-- kleine **Buzz**-Pille ("◗◗◗" / 3/3 = ueberdurchschnittlich)
-- **Trend-Pfeil** ▲ / ▼ wenn `|trend_delta| > 10`
-- **Talk-Type-Chip** ("Earnings", "M&A", "Legal", ...)
+### Quellen-Trust adaptiv
+Statt fixem `source.trust` aus der Config: pro Quelle die durchschnittliche
+Konsistenz-Quote berechnen (wie oft stimmt Sentiment dieser Quelle mit
+3-Tages-Median ueberein?). Bei systematischer Abweichung trust-Faktor
+abdaempfen. **P2.**
 
-Im Detail-Modal:
-- Sentiment-Trend ueber Zeit (kleine Sparkline)
-- Verteilung Talk-Types
-- "wie geredet wird"-Zusammenfassung (Top-3 Phrasen, Konsens-Indikator)
+### Zeitabklang
+Aeltere Artikel im Fenster zaehlen weniger. Half-life 24h (in
+`settings.json` schon vorgesehen, aber noch nicht angewandt). Pro Artikel
+ein `recency_weight = 0.5 ^ (age_hours / half_life)`.
+
+### Reichweite / Cross-Quellen-Bestaetigung
+Wenn dieselbe Nachricht in 5 Quellen auftaucht, sollte das mehr zaehlen als
+1 Quelle, die 5 Variationen aussendet. Mini-Cluster-Bildung ueber
+Title-Shingles (Jaccard 0.6), Cluster-Score = max(weight) statt sum.
+**P1 fuer naechste Iteration.**
+
+---
+
+## 4. Filterung & Auswertung verbessern
+
+### Talk-Type-Filter im API
+`/api/overview?days=7&talk=earnings` filtert auf der API-Ebene.
+Eingebaut, damit UI-Filter auch Server-side zaehlt.
+
+### Sektor- und Sprach-Filter
+`/api/overview?sector=auto`, `?lang=de`. Erlaubt Drill-Down auf
+DAX-Sektoren oder nur deutsche Quellen.
+
+### Konsens-Klassifikation expliziter
+Neben Score `consensus`: ein Klartext-Label `consensus_label`:
+- `>=0.85` &rarr; "einhellig"
+- `>=0.65` &rarr; "eher einig"
+- `>=0.45` &rarr; "gemischt"
+- `<0.45` &rarr; "geteilt"
+
+### "Hot Topics" — Cross-Aktien-Themen
+Welche Talk-Types dominieren *insgesamt* gerade? Endpoint
+`/api/topics?days=7` aggregiert: "earnings (+24%) zieht aktuell viel
+Aufmerksamkeit", "legal (-12%) ruhig".
+
+### Quellen-Health
+`/api/sources/health?days=7`: pro Quelle die Erfolgs-Quote der letzten
+Scans + durchschnittliche Item-Zahl. Hilft zu sehen welche Feeds
+zuverlaessig liefern.
+
+### Watchlist-Compare
+2-3 Aktien direkt vergleichen (Sparklines uebereinander, Stats
+nebeneinander). UI-only.
+
+---
+
+## 5. UI-Verbesserungen
+
+- **Dark Mode** Toggle im Header
+- Pro Karte: kleine 7-Tage-Sparkline rechts unten
+- Heatmap-View: 40 Aktien als Tile-Grid, Farbe = mood_100
+- Quellen-Pille im Article-Item klickbar &rarr; Filter auf nur diese Quelle
+- Tastatur-Shortcuts: `/` fokussiert Suche, `r` reload, `s` scan
+
+---
+
+## 6. Tests
+
+- Stock-Matcher: Disambiguierungs-Tests (Porsche AG vs. Porsche SE, Mercedes-Benz vs. Mercedes Sosa)
+- ISIN-Matching
+- Title-Scoring vs. Body-Scoring
+- node:sqlite-Migration-Test funktioniert
+
+---
 
 ## Reihenfolge
 
-1. ✅ Plan
-2. Lexikon erweitern (DE/EN), Bull/Bear-Lexikon, Talk-Type-Trigger
-3. Analyzer umbauen (Aspekt-Fenster, Bull/Bear-Score, Talk-Type)
-4. DB-Schema erweitern (article: bull_score, talk_type, intensity, aspect_polarity)
-5. Pipeline und Aggregate (consensus, buzz, trend_delta, top_talk_type)
-6. Fetching haerten (UA, Retry, mehr Quellen)
-7. Server-API um neue Felder erweitern
-8. UI: Badges, Pillen, Trend-Pfeile, Talk-Chips
-9. README neu schreiben
-10. Tests aktualisieren + neue Tests fuer Bull/Bear, Talk-Type, Aspekt
-11. End-to-End-Smoketest
+1. `node:sqlite` Migration in database.js
+2. package.json updaten (Dependencies, engines, scripts mit Flag fuer Node 22.x)
+3. Test-Datei anpassen (better-sqlite3 raus)
+4. Disambiguierung im Stock-Matcher
+5. ISIN/Ticker-Match
+6. Title-Polarity-Boost
+7. Konsens-Label
+8. Talk-Filter im API + Hot-Topics-Endpoint
+9. UI: Dark Mode, Sparkline auf Karte, Konsens-Label
+10. README mit Setup-Hinweisen fuer Windows
+11. Tests komplett gruen
 12. Commit + Push

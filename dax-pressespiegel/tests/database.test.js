@@ -114,8 +114,8 @@ test('database: startScan/finishScan', () => {
 test('database: Migration faegt Spalten zu alten DBs hinzu', () => {
   const { path: p } = tempDb();
   // Alte DB ohne neue Spalten erzeugen.
-  const Database = require('better-sqlite3');
-  const old = new Database(p);
+  const { DatabaseSync } = require('node:sqlite');
+  const old = new DatabaseSync(p);
   old.exec(`
     CREATE TABLE articles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

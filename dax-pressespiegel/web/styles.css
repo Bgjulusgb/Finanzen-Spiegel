@@ -21,6 +21,29 @@
   --shadow: 0 1px 3px rgba(20,30,60,0.06), 0 1px 2px rgba(20,30,60,0.04);
 }
 
+html[data-theme="dark"] {
+  --bg: #0f1115;
+  --bg-card: #161a22;
+  --bg-soft: #1d2230;
+  --border: #2a3142;
+  --text: #e6e9ef;
+  --text-dim: #8a93a4;
+  --accent: #60a5fa;
+  --pos: #34d399;
+  --pos-soft: #064e3b;
+  --neg: #f87171;
+  --neg-soft: #4c0f12;
+  --neu: #8a93a4;
+  --neu-soft: #2a3142;
+  --bull: #34d399;
+  --bull-soft: #064e3b;
+  --bear: #fb7185;
+  --bear-soft: #4c0f12;
+  --buzz: #a78bfa;
+  --buzz-soft: #2e1a5a;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+}
+
 * { box-sizing: border-box; }
 body {
   margin: 0;

@@ -7,6 +7,7 @@ const els = {
   talkFilter: document.getElementById('talk-filter'),
   filterInput: document.getElementById('filter-input'),
   scanBtn: document.getElementById('scan-btn'),
+  themeBtn: document.getElementById('theme-btn'),
   statusPill: document.getElementById('status-pill'),
   sumPos: document.getElementById('sum-pos'),
   sumNeu: document.getElementById('sum-neu'),
@@ -96,9 +97,12 @@ function buildCard(stock) {
     if (stock.trend_delta > 0) chips.push(`<span class="chip trend-up">▲ ${stock.trend_delta.toFixed(0)}</span>`);
     else chips.push(`<span class="chip trend-down">▼ ${Math.abs(stock.trend_delta).toFixed(0)}</span>`);
   }
-  if (stock.n_articles >= 3) {
-    if (stock.consensus >= 0.75) chips.push('<span class="chip consensus">einhellig</span>');
-    else if (stock.consensus <= 0.4) chips.push('<span class="chip divisive">geteilt</span>');
+  if (stock.n_articles >= 3 && stock.consensus_label) {
+    const c = stock.consensus_label;
+    if (c === 'einhellig' || c === 'eher einig')
+      chips.push(`<span class="chip consensus">${c}</span>`);
+    else if (c === 'geteilt' || c === 'gemischt')
+      chips.push(`<span class="chip divisive">${c}</span>`);
   }
 
   const articlesHtml = (stock.top_articles && stock.top_articles.length)
@@ -274,9 +278,7 @@ async function openDetail(symbol) {
       .map(([t, n]) => `<span class="chip talk-${t}">${TALK_LABELS[t] || t} &middot; ${n}</span>`)
       .join('');
 
-    const consensusTxt = data.n_articles >= 3
-      ? (data.consensus >= 0.75 ? 'einhellig' : data.consensus >= 0.55 ? 'eher einig' : data.consensus >= 0.4 ? 'gemischt' : 'geteilt')
-      : '-';
+    const consensusTxt = data.n_articles >= 3 ? (data.consensus_label || '-') : '-';
 
     els.modalBody.innerHTML = `
       <h2>${escape(s.name)} <span class="card-symbol">${s.symbol}</span></h2>
@@ -339,6 +341,28 @@ els.scanBtn.addEventListener('click', async () => {
   } finally {
     els.scanBtn.disabled = false;
   }
+});
+
+// Theme: persistiert in localStorage.
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  els.themeBtn.textContent = theme === 'dark' ? 'Light' : 'Dark';
+  try { localStorage.setItem('dax-theme', theme); } catch {}
+}
+els.themeBtn.addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+});
+const savedTheme = (() => { try { return localStorage.getItem('dax-theme'); } catch { return null; } })();
+applyTheme(savedTheme || (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+// Tastatur-Shortcuts: / = Suche fokussieren, r = reload, s = scan, Esc = Modal zu.
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === '/') { e.preventDefault(); els.filterInput.focus(); }
+  else if (e.key === 'r') { e.preventDefault(); loadOverview(); }
+  else if (e.key === 's') { e.preventDefault(); els.scanBtn.click(); }
+  else if (e.key === 'Escape' && els.modal.open) els.modal.close();
 });
 
 loadOverview();

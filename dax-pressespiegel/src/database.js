@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 
 // Tabellen-Defs (ohne Indizes auf neuen Spalten - die kommen nach migrate).
 const SCHEMA_TABLES = `
@@ -72,14 +72,27 @@ function migrate(db) {
 
 function open(dbPath) {
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  const db = new Database(dbPath);
-  db.pragma('journal_mode = WAL');
-  db.pragma('synchronous = NORMAL');
-  db.pragma('foreign_keys = ON');
+  const db = new DatabaseSync(dbPath);
+  db.exec('PRAGMA journal_mode = WAL');
+  db.exec('PRAGMA synchronous = NORMAL');
+  db.exec('PRAGMA foreign_keys = ON');
   db.exec(SCHEMA_TABLES);
   migrate(db);                 // Spalten zuerst sicherstellen,
   db.exec(SCHEMA_INDEXES);     // dann Indizes (manche referenzieren neue Spalten).
   return db;
+}
+
+// Helper: Transaktion ueber node:sqlite (keine eingebaute transaction()-API).
+function transaction(db, fn) {
+  db.exec('BEGIN');
+  try {
+    const result = fn();
+    db.exec('COMMIT');
+    return result;
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
 }
 
 function insertArticle(db, art) {
@@ -97,9 +110,9 @@ function insertArticle(db, art) {
     pos_hits: 0, neg_hits: 0, sentiment_label: null, bull_label: null, talk_type: null,
     ...art,
   });
-  if (info.changes > 0) return info.lastInsertRowid;
+  if (info.changes > 0) return Number(info.lastInsertRowid);
   const row = db.prepare('SELECT id FROM articles WHERE url_hash = ?').get(art.url_hash);
-  return row ? row.id : null;
+  return row ? Number(row.id) : null;
 }
 
 function updateArticleAnalysis(db, id, data) {
@@ -122,7 +135,8 @@ function insertMentions(db, articleId, mentionsBySymbol) {
       (article_id, stock_symbol, mentions, title_hit, aspect_polarity, aspect_bull)
     VALUES (?, ?, ?, ?, ?, ?)
   `);
-  const tx = db.transaction((entries) => {
+  const entries = Object.entries(mentionsBySymbol);
+  transaction(db, () => {
     for (const [symbol, m] of entries) {
       stmt.run(
         articleId, symbol, m.mentions, m.title_hit ? 1 : 0,
@@ -130,12 +144,11 @@ function insertMentions(db, articleId, mentionsBySymbol) {
       );
     }
   });
-  tx(Object.entries(mentionsBySymbol));
 }
 
 function startScan(db) {
   const info = db.prepare('INSERT INTO scans (started_utc) VALUES (?)').run(new Date().toISOString());
-  return info.lastInsertRowid;
+  return Number(info.lastInsertRowid);
 }
 
 function finishScan(db, id, summary) {
@@ -182,6 +195,10 @@ function _aggregate(rows) {
   const variance = sentValues.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
   const sigma = Math.sqrt(variance);
   const consensus = Math.max(0, 1 - sigma);  // 0..1
+  const consensus_label =
+    consensus >= 0.85 ? 'einhellig' :
+    consensus >= 0.65 ? 'eher einig' :
+    consensus >= 0.45 ? 'gemischt' : 'geteilt';
   // Top-Talk: "general" nur als Fallback - bevorzuge spezifische Themen,
   // wenn sie mindestens 20% der Artikel ausmachen.
   let topTalk = null, topTalkN = 0;
@@ -201,6 +218,7 @@ function _aggregate(rows) {
     bull, bull_100: Math.round(bull * 1000) / 10,
     intensity: intSum / n,
     consensus,
+    consensus_label,
     top_talk_type: topTalk,
     talk_distribution: talkCount,
     last_seen: lastSeen,
