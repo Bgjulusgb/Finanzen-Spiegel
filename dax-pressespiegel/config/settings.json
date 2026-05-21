@@ -1,0 +1,30 @@
+{
+  "database": {
+    "path": "./data/dax-pressespiegel.db"
+  },
+  "server": {
+    "port": 4712,
+    "host": "127.0.0.1"
+  },
+  "scan": {
+    "max_articles_per_source": 80,
+    "recency_lookback_days": 14,
+    "concurrent_fetches": 6,
+    "request_timeout_ms": 15000,
+    "user_agent": "Mozilla/5.0 (compatible; DAX-Pressespiegel/0.1; local research bot)"
+  },
+  "sentiment": {
+    "recency_half_life_hours": 24,
+    "source_trust_floor": 0.3,
+    "polarity_neutral_zone": [-0.05, 0.05],
+    "min_mentions_for_score": 1
+  },
+  "schedule": {
+    "auto_scan_minutes": 30,
+    "auto_scan_on_start": true
+  },
+  "ui": {
+    "default_window_days": 7,
+    "max_articles_per_card": 5
+  }
+}
