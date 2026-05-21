@@ -12,13 +12,13 @@
       <span class="logo">DAX</span>
       <div>
         <h1>DAX 40 Pressespiegel</h1>
-        <p>Stimmungsbild aus deutscher &amp; internationaler Presse</p>
+        <p>Stimmungsbild &middot; Bull/Bear &middot; Buzz &middot; Wie wird geredet</p>
       </div>
     </div>
     <div class="controls">
       <label>Zeitraum
         <select id="window-select">
-          <option value="1">24 Stunden</option>
+          <option value="1">24h</option>
           <option value="3">3 Tage</option>
           <option value="7" selected>7 Tage</option>
           <option value="14">14 Tage</option>
@@ -28,15 +28,37 @@
       <label>Sortierung
         <select id="sort-select">
           <option value="articles">meiste Artikel</option>
+          <option value="bullish">bullischste</option>
+          <option value="bearish">bearischste</option>
           <option value="best">positivstes Sentiment</option>
           <option value="worst">negativstes Sentiment</option>
+          <option value="buzz">groesster Buzz</option>
+          <option value="trending_up">Trend ↑</option>
+          <option value="trending_down">Trend ↓</option>
           <option value="name">A-Z</option>
+        </select>
+      </label>
+      <label>Talk-Type
+        <select id="talk-filter">
+          <option value="">alle</option>
+          <option value="earnings">Earnings</option>
+          <option value="mna">M&amp;A</option>
+          <option value="analyst">Analyst</option>
+          <option value="legal">Recht</option>
+          <option value="product">Produkt</option>
+          <option value="scandal">Skandal</option>
+          <option value="macro">Makro</option>
+          <option value="guidance">Guidance</option>
+          <option value="dividend">Dividende</option>
+          <option value="personnel">Personalie</option>
+          <option value="general">Allgemein</option>
         </select>
       </label>
       <label>Filter
         <input id="filter-input" type="search" placeholder="z.B. SAP, Auto, ..." />
       </label>
-      <button id="scan-btn" title="Manuell scannen">SCAN</button>
+      <button id="scan-btn" title="Manuell scannen (s)">SCAN</button>
+      <button id="theme-btn" title="Light / Dark umschalten">Dark</button>
       <span id="status-pill" class="pill">bereit</span>
     </div>
   </header>
@@ -45,6 +67,8 @@
     <div class="summary-cell"><span class="label">positiv</span><strong id="sum-pos">--</strong></div>
     <div class="summary-cell"><span class="label">neutral</span><strong id="sum-neu">--</strong></div>
     <div class="summary-cell"><span class="label">negativ</span><strong id="sum-neg">--</strong></div>
+    <div class="summary-cell"><span class="label">bullisch</span><strong id="sum-bull">--</strong></div>
+    <div class="summary-cell"><span class="label">bearisch</span><strong id="sum-bear">--</strong></div>
     <div class="summary-cell"><span class="label">Artikel gesamt</span><strong id="sum-art">--</strong></div>
     <div class="summary-cell"><span class="label">letzter Scan</span><strong id="sum-scan">--</strong></div>
   </section>
@@ -57,7 +81,7 @@
   </dialog>
 
   <footer class="footer">
-    <span>DAX 40 Pressespiegel | lokal | open-source | ohne kostenpflichtige APIs</span>
+    <span>DAX 40 Pressespiegel &middot; lokal &middot; open-source &middot; ohne kostenpflichtige APIs</span>
     <span id="footer-ts"></span>
   </footer>
 
