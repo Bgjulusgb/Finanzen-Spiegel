@@ -1,0 +1,50 @@
+{
+  "_comment": "Finanz-Sentiment-Lexikon. Negationswoerter kehren das naechstgelegene Sentiment-Wort um (Fenster 3 Tokens).",
+  "lang": {
+    "de": {
+      "positive": [
+        "gewinn", "gewinne", "rekordgewinn", "wachstum", "wachstumsstark", "rekord", "stark", "starke",
+        "uebertrifft", "uebertraf", "uebertroffen", "uebertrumpft", "optimistisch", "rally", "rallye",
+        "anstieg", "anstiege", "steigt", "stieg", "gestiegen", "anhebung", "anhob", "uebernahme",
+        "ausbau", "robust", "kursplus", "rekordzahlen", "rekordumsatz", "rekordergebnis", "auftragsplus",
+        "milliardenauftrag", "auftragsboom", "aufschwung", "boom", "gefragt", "beliebt", "begehrt",
+        "ueberraschend gut", "ueberlegen", "marktfuehrer", "branchenfuehrer", "innovation", "expansion",
+        "geplante uebernahme", "rueckenwind", "kursfeuerwerk", "kursziel angehoben", "buy rating",
+        "kaufempfehlung", "kursplus", "dividende erhoeht", "spitzenwert", "tagessieger"
+      ],
+      "negative": [
+        "verlust", "verluste", "millionenverlust", "milliardenverlust", "rueckgang", "rueckgaenge",
+        "schwach", "schwache", "krise", "rezession", "panik", "absturz", "warnung", "gewinnwarnung",
+        "sturz", "einbruch", "klage", "skandal", "ermittlung", "ermittlungen", "untersagt", "verbot",
+        "kurssturz", "kurseinbruch", "ausverkauf", "schock", "schockt", "schockwelle", "abstuft",
+        "abstufung", "downgrade", "verkaufsempfehlung", "sell rating", "tagesverlierer", "schlusslicht",
+        "minus", "abschlag", "gewinneinbruch", "umsatzrueckgang", "auftragsrueckgang", "stellenabbau",
+        "entlassungen", "insolvenz", "pleite", "drohende pleite", "abgesetzt", "betrug", "fraud",
+        "korruption", "geldstrafe", "rueckruf", "produktionsstopp", "fabrikschliessung", "werkschliessung"
+      ]
+    },
+    "en": {
+      "positive": [
+        "beat", "beats", "beating", "outperform", "outperforms", "upgrade", "upgraded", "surge",
+        "surges", "surged", "rally", "rallies", "rallied", "record", "records", "growth", "gain",
+        "gains", "bullish", "strong", "strongest", "soar", "soared", "jump", "jumps", "jumped",
+        "robust", "upside", "buy", "accumulate", "raise", "raised", "raises", "expansion", "win",
+        "wins", "won", "milestone", "breakthrough", "profit", "profits", "profitable", "exceeds",
+        "exceeded", "outpaces", "tops estimates"
+      ],
+      "negative": [
+        "miss", "misses", "missed", "downgrade", "downgraded", "plunge", "plunges", "plunged",
+        "crash", "crashes", "crashed", "panic", "recession", "warning", "warn", "warns", "warned",
+        "lawsuit", "fine", "fined", "loss", "losses", "weak", "weakest", "tumble", "tumbles",
+        "tumbled", "slump", "slumps", "slumped", "sell", "bearish", "downside", "fraud", "scandal",
+        "investigation", "probe", "default", "bankruptcy", "delisting", "halted", "layoffs",
+        "job cuts", "profit warning", "guidance cut"
+      ]
+    }
+  },
+  "negation": {
+    "de": ["nicht", "kein", "keine", "keinen", "ohne", "nie", "niemals", "nichts", "keinerlei"],
+    "en": ["not", "no", "never", "without", "nothing", "neither", "n't", "cannot", "can't"]
+  },
+  "negation_window": 3
+}

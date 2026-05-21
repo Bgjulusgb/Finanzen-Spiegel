@@ -1,0 +1,28 @@
+{
+  "name": "dax-pressespiegel",
+  "version": "0.1.0",
+  "description": "Lokaler Stimmungs-Pressespiegel fuer den DAX 40 - Artikel sammeln, Aktien-Erwaehnungen finden, Sentiment je Aktie auswerten.",
+  "main": "src/server.js",
+  "bin": {
+    "dax-pressespiegel": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js ui",
+    "ui": "node bin/cli.js ui",
+    "scan": "node bin/cli.js scan",
+    "scan:once": "node bin/cli.js scan --once",
+    "list": "node bin/cli.js list",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cheerio": "^1.0.0",
+    "express": "^4.21.2",
+    "rss-parser": "^3.13.0",
+    "undici": "^7.2.0"
+  },
+  "license": "MIT"
+}
